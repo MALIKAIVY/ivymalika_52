@@ -3,83 +3,380 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vunoh Global Assistant</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>Vunoh Global — Diaspora Assistant</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --bg-dark: #0f172a;
-            --card-bg: rgba(30, 41, 59, 0.7);
-            --text-main: #f8fafc;
-            --text-dim: #94a3b8;
+            --primary: #2e7d32; /* Kenyan Fintech Green */
+            --primary-light: #4caf50;
+            --secondary: #f5f5f5;
+            --white: #ffffff;
+            --text-dark: #333333;
+            --text-muted: #666666;
+            --border: #e0e0e0;
+            --low-risk: #4caf50;
+            --medium-risk: #ff9800;
+            --high-risk: #f44336;
         }
 
         body {
-            font-family: 'Outfit', sans-serif;
-            background-color: var(--bg-dark);
-            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
             margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
-            background-image: radial-gradient(circle at 50% 50%, #1e293b 0%, #0f172a 100%);
-        }
-
-        .container {
-            width: 90%;
-            max-width: 600px;
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            padding: 3rem;
-            border-radius: 24px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            text-align: center;
-            animation: fadeIn 0.8s ease-out;
-        }
-
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            background: linear-gradient(to right, #818cf8, #c084fc);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        p {
-            color: var(--text-dim);
-            font-size: 1.1rem;
+            padding: 0;
+            background-color: var(--secondary);
+            color: var(--text-dark);
             line-height: 1.6;
         }
 
-        .status-badge {
-            display: inline-block;
-            margin-top: 2rem;
-            padding: 0.5rem 1.5rem;
-            background: rgba(99, 102, 241, 0.2);
-            border: 1px solid var(--primary);
-            border-radius: 9999px;
-            color: var(--primary);
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            font-size: 0.8rem;
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1rem;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        .card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        h1, h2 {
+            color: var(--primary);
+            margin-top: 0;
+        }
+
+        textarea {
+            width: 100%;
+            height: 120px;
+            padding: 1rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+
+        button {
+            background-color: var(--primary);
+            color: var(--white);
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .loading {
+            display: none;
+            margin: 1rem 0;
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        #resultsArea {
+            display: none;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .result-item label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+        }
+
+        .result-item span {
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .risk-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            color: white;
+            font-size: 0.85rem;
+        }
+
+        .risk-low { background-color: var(--low-risk); }
+        .risk-medium { background-color: var(--medium-risk); }
+        .risk-high { background-color: var(--high-risk); }
+
+        .messages-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .msg-box {
+            background: #f8fafc;
+            padding: 1rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+
+        .msg-box h4 {
+            margin: 0 0 0.5rem 0;
+            font-size: 0.9rem;
+            color: var(--primary);
+        }
+
+        .msg-box p {
+            font-size: 0.85rem;
+            margin: 0;
+            white-space: pre-wrap;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background-color: #f9fafb;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+
+        select {
+            padding: 0.4rem;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+        }
+
+        .save-btn {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.8rem;
+            margin-left: 0.5rem;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Vunoh Global</h1>
-        <p>Your intelligent assistant is ready to process your requests. Experience the future of automated operations.</p>
-        <div class="status-badge">System Active</div>
+        <!-- Input Section -->
+        <div class="card">
+            <h2>Vunoh Global — Diaspora Assistant</h2>
+            <p>Type your request in plain English (e.g., "I need to send 50,000 KES to my mother in Nairobi for medical bills")</p>
+            <textarea id="requestInput" placeholder="Enter your request here..."></textarea>
+            <button onclick="submitRequest()" id="submitBtn">Submit Request</button>
+            <div id="loader" class="loading">Processing with AI... Please wait.</div>
+
+            <div id="resultsArea">
+                <h3>Processing Result</h3>
+                <div class="results-grid">
+                    <div class="result-item">
+                        <label>Task Code</label>
+                        <span id="resCode">-</span>
+                    </div>
+                    <div class="result-item">
+                        <label>Detected Intent</label>
+                        <span id="resIntent">-</span>
+                    </div>
+                    <div class="result-item">
+                        <label>Risk Level</label>
+                        <span id="resRiskBadge" class="risk-badge">-</span>
+                    </div>
+                    <div class="result-item">
+                        <label>Assigned Team</label>
+                        <span id="resTeam">-</span>
+                    </div>
+                </div>
+                
+                <div class="result-item">
+                    <label>Generated Steps</label>
+                    <ol id="resSteps"></ol>
+                </div>
+
+                <div class="messages-row">
+                    <div class="msg-box">
+                        <h4>WhatsApp Message</h4>
+                        <p id="resWhatsApp"></p>
+                    </div>
+                    <div class="msg-box">
+                        <h4>Email Message</h4>
+                        <p id="resEmail"></p>
+                    </div>
+                    <div class="msg-box">
+                        <h4>SMS Message</h4>
+                        <p id="resSMS"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Section -->
+        <div class="card">
+            <h2>Task Dashboard</h2>
+            <table id="tasksTable">
+                <thead>
+                    <tr>
+                        <th>Task Code</th>
+                        <th>Intent</th>
+                        <th>Status</th>
+                        <th>Risk Score</th>
+                        <th>Team</th>
+                        <th>Created At</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="tasksBody">
+                    <!-- Loaded via JS -->
+                </tbody>
+            </table>
+        </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', loadDashboard);
+
+        async function submitRequest() {
+            const message = document.getElementById('requestInput').value;
+            if (!message) return alert("Please enter a request.");
+
+            const btn = document.getElementById('submitBtn');
+            const loader = document.getElementById('loader');
+            const results = document.getElementById('resultsArea');
+
+            btn.disabled = true;
+            loader.style.display = 'block';
+            results.style.display = 'none';
+
+            try {
+                const response = await fetch('/api/process-request/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: message })
+                });
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    displayResult(data.task);
+                    loadDashboard();
+                } else {
+                    alert("Error: " + data.message);
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Failed to process request.");
+            } finally {
+                btn.disabled = false;
+                loader.style.display = 'none';
+            }
+        }
+
+        function displayResult(task) {
+            const results = document.getElementById('resultsArea');
+            results.style.display = 'block';
+
+            document.getElementById('resCode').textContent = task.task_code;
+            document.getElementById('resIntent').textContent = task.intent.replace('_', ' ');
+            
+            const riskBadge = document.getElementById('resRiskBadge');
+            riskBadge.className = 'risk-badge risk-' + (task.risk_label || 'low').toLowerCase();
+            riskBadge.textContent = (task.risk_label || 'Low') + ` (${task.risk_score || 0})`;
+            
+            document.getElementById('resTeam').textContent = task.employee_assignment || 'Support';
+
+            // Stub steps if none provided by backend stub
+            const stepsUl = document.getElementById('resSteps');
+            stepsUl.innerHTML = '';
+            const steps = task.steps || ["Analyzing request details", "Routing to appropriate team", "Generating notifications"];
+            steps.forEach(s => {
+                const li = document.createElement('li');
+                li.textContent = s;
+                stepsUl.appendChild(li);
+            });
+
+            document.getElementById('resWhatsApp').textContent = task.whatsapp || "Hi, your request " + task.task_code + " is being processed.";
+            document.getElementById('resEmail').textContent = task.email || "Subject: Task " + task.task_code + " Update\n\nYour request has been received.";
+            document.getElementById('resSMS').textContent = task.sms || "Vunoh: Task " + task.task_code + " received.";
+        }
+
+        async function loadDashboard() {
+            try {
+                const response = await fetch('/api/tasks/');
+                const tasks = await response.json();
+                const tbody = document.getElementById('tasksBody');
+                tbody.innerHTML = '';
+
+                tasks.forEach(task => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${task.task_code}</td>
+                        <td>${task.intent.replace('_', ' ')}</td>
+                        <td>
+                            <select id="status-${task.task_code}">
+                                <option value="Pending" ${task.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                                <option value="In Progress" ${task.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
+                                <option value="Completed" ${task.status === 'Completed' ? 'selected' : ''}>Completed</option>
+                            </select>
+                        </td>
+                        <td>${task.risk_score} (${task.risk_label})</td>
+                        <td>${task.employee_assignment}</td>
+                        <td>${new Date(task.created_at).toLocaleDateString()}</td>
+                        <td>
+                            <button class="save-btn" onclick="updateStatus('${task.task_code}')">Save</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (err) {
+                console.error("Dashboard load failed", err);
+            }
+        }
+
+        async function updateStatus(taskCode) {
+            const status = document.getElementById(`status-${taskCode}`).value;
+            try {
+                const response = await fetch(`/api/tasks/${taskCode}/status/`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: status })
+                });
+                const data = await response.json();
+                if (data.status === 'success') {
+                    alert("Status updated!");
+                } else {
+                    alert("Error: " + data.message);
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Failed to update status.");
+            }
+        }
+    </script>
 </body>
 </html>
