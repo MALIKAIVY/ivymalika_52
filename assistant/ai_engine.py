@@ -157,16 +157,19 @@ Examples by intent:
         # On error return fallback
         return ["Task received", "Being reviewed by our team", "Customer will be notified"]
 
-def generate_messages(intent, entities, task_code, risk_label):
-    system_prompt = """You are a communications assistant for Vunoh Global, a platform helping 
+def generate_messages(intent, entities, task_code, risk_label, customer_name):
+    system_prompt = f"""You are a communications assistant for Vunoh Global, a platform helping 
 Kenyans in the diaspora manage tasks back home. Generate three confirmation 
 messages for a task. Return ONLY a valid JSON object with exactly these 
 three keys: whatsapp, email, sms. No markdown, no backticks, no extra text.
+
+The customer name is: {customer_name}.
 
 Rules for each format:
 
 whatsapp:
 - Conversational and warm tone
+- Address the customer by name: {customer_name}
 - Use line breaks naturally
 - 1 or 2 emojis maximum
 - Include the task code, what was requested, and next steps
@@ -174,7 +177,7 @@ whatsapp:
 
 email:
 - Formal and professional
-- Start with 'Dear Valued Customer,'
+- Start with 'Dear {customer_name},'
 - Include: task code, full details of the request, risk level, 
   next steps, and close with 'Warm regards, Vunoh Global Team'
 - 150 to 200 words
@@ -182,6 +185,7 @@ email:
 sms:
 - Maximum 160 characters
 - Include task code and one key action only
+- Mention the customer name briefly if possible
 - No emojis"""
 
     try:
@@ -196,9 +200,9 @@ sms:
         return json.loads(response.text)
     except Exception as e:
         return {
-          "whatsapp": f"Hi! Your task {task_code} has been received. We will be in touch shortly.",
-          "email": f"Dear Valued Customer, Your task {task_code} has been received. Warm regards, Vunoh Global Team",
-          "sms": f"Vunoh: Task {task_code} received. We will contact you shortly."
+          "whatsapp": f"Hi {customer_name}! Your task {task_code} has been received. We will be in touch shortly.",
+          "email": f"Dear {customer_name}, Your task {task_code} has been received. Warm regards, Vunoh Global Team",
+          "sms": f"Vunoh: Task {task_code} received for {customer_name}. We will contact you shortly."
         }
 
 def assign_employee(intent):

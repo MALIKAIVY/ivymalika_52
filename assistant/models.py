@@ -35,6 +35,9 @@ class Task(models.Model):
     ]
 
     task_code = models.CharField(max_length=10, unique=True, default=generate_task_code, editable=False)
+    customer_name = models.CharField(max_length=100, blank=True, null=True)
+    customer_phone = models.CharField(max_length=20, blank=True, null=True)
+    customer_email = models.EmailField(max_length=100, blank=True, null=True)
     intent = models.CharField(max_length=50, choices=INTENT_CHOICES)
     entities = models.JSONField(default=dict)
     risk_score = models.IntegerField(default=0)

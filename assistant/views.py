@@ -13,8 +13,12 @@ from .ai_engine import (
 )
 
 def index(request):
-    """Serves the frontend HTML page."""
+    """Renders the Customer Intake Portal."""
     return render(request, 'index.html')
+
+def dashboard(request):
+    """Renders the internal Operations Dashboard."""
+    return render(request, 'dashboard.html')
 
 @csrf_exempt
 def process_request(request):
@@ -23,6 +27,9 @@ def process_request(request):
         try:
             data = json.loads(request.body)
             message = data.get('message', '')
+            customer_name = data.get('customer_name', 'Valued Customer')
+            customer_phone = data.get('customer_phone', '')
+            customer_email = data.get('customer_email', '')
             
             if not message:
                 return JsonResponse({"status": "error", "message": "Message is required"}, status=400)
@@ -47,12 +54,15 @@ def process_request(request):
             task_code = generate_task_code()
 
             # 6. Generate Messages
-            messages = generate_messages(intent, entities, task_code, risk_label)
+            messages = generate_messages(intent, entities, task_code, risk_label, customer_name)
 
             # 7. Save to Database (Atomic)
             with transaction.atomic():
                 task = Task.objects.create(
                     task_code=task_code,
+                    customer_name=customer_name,
+                    customer_phone=customer_phone,
+                    customer_email=customer_email,
                     intent=intent,
                     entities=entities,
                     risk_score=risk_score,
@@ -80,11 +90,14 @@ def process_request(request):
             return JsonResponse({
                 "status": "success",
                 "task_code": task_code,
+                "customer_name": customer_name,
+                "customer_phone": customer_phone,
+                "customer_email": customer_email,
                 "intent": intent,
                 "entities": entities,
                 "risk_score": risk_score,
                 "risk_label": risk_label,
-                "status": task.status,
+                "task_status": task.status,
                 "employee_assignment": team,
                 "steps": steps,
                 "messages": messages,
@@ -95,6 +108,35 @@ def process_request(request):
             return JsonResponse({"status": "error", "message": str(e)}, status=500)
             
     return JsonResponse({"status": "error", "message": "Method not allowed"}, status=405)
+
+def get_task_detail(request, task_code):
+    """Returns full task details including steps and messages."""
+    task = get_object_or_404(Task, task_code=task_code)
+    steps = list(task.steps.all().values_list('description', flat=True))
+    
+    # Get the latest message record
+    message_rec = task.messages.order_by('-created_at').first()
+    
+    return JsonResponse({
+        "status": "success",
+        "task_code": task.task_code,
+        "customer_name": task.customer_name,
+        "customer_phone": task.customer_phone,
+        "customer_email": task.customer_email,
+        "intent": task.intent,
+        "entities": task.entities,
+        "risk_score": task.risk_score,
+        "risk_label": task.risk_label,
+        "employee_assignment": task.employee_assignment,
+        "task_status": task.status,
+        "created_at": task.created_at.isoformat(),
+        "steps": steps,
+        "messages": {
+            "whatsapp": message_rec.whatsapp_message if message_rec else "",
+            "email": message_rec.email_message if message_rec else "",
+            "sms": message_rec.sms_message if message_rec else ""
+        }
+    })
 
 def get_tasks(request):
     """Returns all tasks as JSON."""

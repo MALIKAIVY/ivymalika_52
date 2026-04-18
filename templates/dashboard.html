@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ops Dashboard | Vunoh Global</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="nav-bar">
+            <a href="/" class="nav-link">← Customer Portal</a>
+        </div>
+
+        <div class="card">
+            <div class="dashboard-header">
+                <h2>Operations Dashboard</h2>
+                <button onclick="loadDashboard()" class="btn btn-outline">
+                    Refresh Data
+                </button>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="label">Total Tasks</span>
+                    <span id="statTotal" class="value">0</span>
+                </div>
+                <div class="stat-card stat-high-risk">
+                    <span class="label">High Risk</span>
+                    <span id="statHighRisk" class="value">0</span>
+                </div>
+                <div class="stat-card stat-pending">
+                    <span class="label">Pending</span>
+                    <span id="statPending" class="value">0</span>
+                </div>
+                <div class="stat-card stat-completed">
+                    <span class="label">Completed</span>
+                    <span id="statCompleted" class="value">0</span>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="filter-bar">
+                <div class="filter-chip active" onclick="applyFilter('All', this)">All Tasks</div>
+                <div class="filter-chip" onclick="applyFilter('Pending', this)">Pending</div>
+                <div class="filter-chip" onclick="applyFilter('In Progress', this)">In Progress</div>
+                <div class="filter-chip" onclick="applyFilter('Completed', this)">Completed</div>
+            </div>
+            
+            <div id="dashboardContent">
+                <table id="tasksTable">
+                    <thead>
+                        <tr>
+                            <th>Ref Code</th>
+                            <th>Service</th>
+                            <th>Current Status</th>
+                            <th>Risk Index</th>
+                            <th>Team</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tasksBody">
+                        <!-- Loaded via JS -->
+                    </tbody>
+                </table>
+                <div id="emptyState" class="empty-state" style="display: none;">
+                    <p>No tasks found for this filter.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detail Viewer Area (Hidden by default) -->
+        <div id="resultsArea" class="card" style="display: none; border-top: 5px solid var(--primary);">
+            <div class="success-banner" style="background: var(--secondary);">
+                <h2 id="resSuccessTitle">Task Details</h2>
+            </div>
+
+            <div class="results-grid">
+                <div class="details-col">
+                    <div class="result-item">
+                        <label>Customer Name</label>
+                        <span id="resCustName" style="color: var(--primary-dark); font-weight: 700;">-</span>
+                    </div>
+                    <div class="result-item">
+                        <label>Contact (Phone / Email)</label>
+                        <span id="resCustContact" style="font-size: 0.9rem; color: var(--text-muted);">-</span>
+                    </div>
+                    <div class="result-item">
+                        <label>Service Category</label>
+                        <span id="resIntent">-</span>
+                    </div>
+                    <div class="result-item">
+                        <label>Risk Assessment</label>
+                        <span id="resRiskBadge" class="risk-chip">-</span>
+                    </div>
+                    <div class="result-item">
+                        <label>Assigned Department</label>
+                        <span id="resTeam">-</span>
+                    </div>
+                    <div class="result-item">
+                        <label>Current Status</label>
+                        <span id="resStatusBadge" class="status-badge">-</span>
+                    </div>
+                </div>
+
+                <div class="steps-col">
+                    <div class="result-item">
+                        <label>Next Steps for Our Team</label>
+                        <ol id="resSteps" style="margin-left: 1.25rem; font-weight: 500;"></ol>
+                    </div>
+                    <div class="result-item" style="margin-top: 2rem;">
+                        <label>Request Date</label>
+                        <span id="resDate" style="font-size: 0.9rem;">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <h3>Communication Templates</h3>
+            <div class="messages-row">
+                <!-- WhatsApp -->
+                <div class="msg-box msg-box-whatsapp">
+                    <h4>WhatsApp Message</h4>
+                    <textarea id="resWhatsApp" class="msg-textarea" readonly></textarea>
+                    <div class="copy-row">
+                        <button class="btn btn-outline" style="background: white; border: none; font-size: 0.8rem;" onclick="copyText('resWhatsApp', 'copy-wa')">Copy Content</button>
+                        <span id="copy-wa" class="copy-feedback">Copied!</span>
+                    </div>
+                </div>
+                <!-- Email -->
+                <div class="msg-box msg-box-email">
+                    <h4>Professional Email</h4>
+                    <textarea id="resEmail" class="msg-textarea" readonly></textarea>
+                    <div class="copy-row">
+                        <button class="btn btn-outline" style="background: white; border: none; font-size: 0.8rem;" onclick="copyText('resEmail', 'copy-email')">Copy Content</button>
+                        <span id="copy-email" class="copy-feedback">Copied!</span>
+                    </div>
+                </div>
+                <!-- SMS -->
+                <div class="msg-box msg-box-sms">
+                    <h4>SMS Alert</h4>
+                    <textarea id="resSMS" class="msg-textarea" readonly></textarea>
+                    <div class="copy-row">
+                        <button class="btn btn-outline" style="background: white; border: none; font-size: 0.8rem;" onclick="copyText('resSMS', 'copy-sms')">Copy Content</button>
+                        <span id="copy-sms" class="copy-feedback">Copied!</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allTasks = [];
+        const intentMap = {
+            'send_money': 'Send Money',
+            'hire_service': 'Hire Service',
+            'verify_document': 'Verify Document',
+            'airport_transfer': 'Airport Transfer',
+            'check_status': 'Check Status'
+        };
+
+        const statusLabelMap = {
+            'Pending': 'status-pending',
+            'In Progress': 'status-inprogress',
+            'Completed': 'status-completed'
+        };
+
+        document.addEventListener('DOMContentLoaded', loadDashboard);
+
+        async function loadDashboard() {
+            try {
+                const response = await fetch('/api/tasks/');
+                allTasks = await response.json();
+                
+                updateStats();
+                renderTasks(allTasks);
+            } catch (err) {
+                console.error("Critical Dashboard Error:", err);
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('statTotal').textContent = allTasks.length;
+            document.getElementById('statHighRisk').textContent = allTasks.filter(t => t.risk_label === 'High').length;
+            document.getElementById('statPending').textContent = allTasks.filter(t => t.status === 'Pending').length;
+            document.getElementById('statCompleted').textContent = allTasks.filter(t => t.status === 'Completed').length;
+        }
+
+        function applyFilter(status, el) {
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+
+            if (status === 'All') {
+                renderTasks(allTasks);
+            } else {
+                const filtered = allTasks.filter(t => t.status === status);
+                renderTasks(filtered);
+            }
+        }
+
+        function renderTasks(tasks) {
+            const table = document.getElementById('tasksTable');
+            const tbody = document.getElementById('tasksBody');
+            const emptyState = document.getElementById('emptyState');
+            
+            if (tasks.length === 0) {
+                table.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            table.style.display = 'table';
+            emptyState.style.display = 'none';
+            tbody.innerHTML = '';
+
+            tasks.forEach(task => {
+                const tr = document.createElement('tr');
+                const dateFormatted = new Date(task.created_at).toLocaleDateString('en-GB', {
+                    day: 'numeric', month: 'short', year: 'numeric'
+                });
+
+                tr.innerHTML = `
+                    <td style="font-weight: 700; color: var(--primary);">#${task.task_code}</td>
+                    <td>${intentMap[task.intent] || task.intent}</td>
+                    <td>
+                        <select id="status-${task.task_code}">
+                            <option value="Pending" ${task.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                            <option value="In Progress" ${task.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
+                            <option value="Completed" ${task.status === 'Completed' ? 'selected' : ''}>Completed</option>
+                        </select>
+                    </td>
+                    <td><span class="risk-chip risk-${task.risk_label.toLowerCase()}">${task.risk_label} (${task.risk_score})</span></td>
+                    <td>${task.employee_assignment}</td>
+                    <td>${dateFormatted}</td>
+                    <td class="action-cell">
+                        <button class="btn btn-outline" style="padding: 0.5rem; font-size: 0.8rem;" onclick="viewTask('${task.task_code}')" title="View Details">👁️</button>
+                        <button class="btn btn-outline save-btn" onclick="updateStatus('${task.task_code}')">Save</button>
+                        <span id="success-${task.task_code}" class="success-flash">Saved!</span>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function viewTask(taskCode) {
+            try {
+                const response = await fetch(`/api/tasks/${taskCode}/`);
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    displayResult(data);
+                    document.getElementById('resultsArea').style.display = 'block';
+                    document.getElementById('resultsArea').scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    alert("Failed to load details: " + data.message);
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Error fetching task details.");
+            }
+        }
+
+        function displayResult(data) {
+            document.getElementById('resCustName').textContent = data.customer_name || 'Valued Customer';
+            document.getElementById('resCustContact').textContent = `${data.customer_phone || ''} ${data.customer_email ? '/ ' + data.customer_email : ''}`;
+
+            document.getElementById('resIntent').textContent = intentMap[data.intent] || data.intent;
+            
+            const riskBadge = document.getElementById('resRiskBadge');
+            riskBadge.className = 'risk-chip risk-' + (data.risk_label || 'low').toLowerCase();
+            riskBadge.textContent = (data.risk_label || 'Low') + ` Index: ${data.risk_score || 0}`;
+            
+            document.getElementById('resTeam').textContent = data.employee_assignment || 'Support';
+            
+            const statusBadge = document.getElementById('resStatusBadge');
+            statusBadge.className = 'status-badge ' + (statusLabelMap[data.task_status] || 'status-pending');
+            statusBadge.textContent = data.task_status || 'Pending';
+
+            const dateObj = new Date(data.created_at);
+            document.getElementById('resDate').textContent = dateObj.toLocaleDateString('en-GB', {
+                day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
+            });
+
+            const stepsUl = document.getElementById('resSteps');
+            stepsUl.innerHTML = '';
+            (data.steps || []).forEach(s => {
+                const li = document.createElement('li');
+                li.textContent = s;
+                stepsUl.appendChild(li);
+            });
+
+            document.getElementById('resWhatsApp').value = data.messages.whatsapp;
+            document.getElementById('resEmail').value = data.messages.email;
+            document.getElementById('resSMS').value = data.messages.sms;
+        }
+
+        async function updateStatus(taskCode) {
+            const status = document.getElementById(`status-${taskCode}`).value;
+            const flash = document.getElementById(`success-${taskCode}`);
+            
+            try {
+                const response = await fetch(`/api/tasks/${taskCode}/status/`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: status })
+                });
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    flash.style.opacity = '1';
+                    setTimeout(() => {
+                        flash.style.opacity = '0';
+                        loadDashboard(); 
+                    }, 2000);
+                } else {
+                    alert("Backend Rejection: " + data.message);
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Server unreachable while updating status.");
+            }
+        }
+
+        function copyText(elementId, feedbackId) {
+            const textarea = document.getElementById(elementId);
+            const feedback = document.getElementById(feedbackId);
+            navigator.clipboard.writeText(textarea.value).then(() => {
+                feedback.style.opacity = '1';
+                setTimeout(() => feedback.style.opacity = '0', 2000);
+            });
+        }
+    </script>
+</body>
+</html>

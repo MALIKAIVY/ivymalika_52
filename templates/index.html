@@ -3,268 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vunoh Global — Diaspora Assistant</title>
+    <title>Customer Portal | Vunoh Global</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #2e7d32; /* Kenyan Fintech Green */
-            --primary-light: #4caf50;
-            --secondary: #f5f5f5;
-            --white: #ffffff;
-            --text-dark: #333333;
-            --text-muted: #666666;
-            --border: #e0e0e0;
-            --low-risk: #4caf50;
-            --medium-risk: #ff9800;
-            --high-risk: #f44336;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: var(--secondary);
-            color: var(--text-dark);
-            line-height: 1.6;
-        }
-
-        .container {
-            max-width: 1000px;
-            margin: 2rem auto;
-            padding: 0 1rem;
-        }
-
-        .card {
-            background: var(--white);
-            border-radius: 12px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        }
-
-        header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        h1, h2 {
-            color: var(--primary);
-            margin-top: 0;
-        }
-
-        textarea {
-            width: 100%;
-            height: 120px;
-            padding: 1rem;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-size: 1rem;
-            margin-bottom: 1rem;
-            box-sizing: border-box;
-            resize: vertical;
-        }
-
-        button {
-            background-color: var(--primary);
-            color: var(--white);
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        button:hover {
-            background-color: var(--primary-dark);
-        }
-
-        .loading {
-            display: none;
-            margin: 1rem 0;
-            color: var(--primary);
-            font-weight: 500;
-        }
-
-        #resultsArea {
-            display: none;
-            margin-top: 2rem;
-            padding-top: 2rem;
-            border-top: 1px solid var(--border);
-        }
-
-        .results-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .result-item label {
-            display: block;
-            font-weight: 600;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-bottom: 0.25rem;
-        }
-
-        .result-item span {
-            font-size: 1.1rem;
-            font-weight: 500;
-        }
-
-        .risk-badge {
-            padding: 0.25rem 0.75rem;
-            border-radius: 999px;
-            color: white;
-            font-size: 0.85rem;
-        }
-
-        .risk-low { background-color: var(--low-risk); }
-        .risk-medium { background-color: var(--medium-risk); }
-        .risk-high { background-color: var(--high-risk); }
-
-        .messages-row {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1rem;
-            margin-top: 1.5rem;
-        }
-
-        .msg-box {
-            background: #f8fafc;
-            padding: 1rem;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-        }
-
-        .msg-box h4 {
-            margin: 0 0 0.5rem 0;
-            font-size: 0.9rem;
-            color: var(--primary);
-        }
-
-        .msg-box p {
-            font-size: 0.85rem;
-            margin: 0;
-            white-space: pre-wrap;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 1rem;
-        }
-
-        th, td {
-            text-align: left;
-            padding: 1rem;
-            border-bottom: 1px solid var(--border);
-        }
-
-        th {
-            background-color: #f9fafb;
-            font-weight: 600;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.025em;
-        }
-
-        select {
-            padding: 0.4rem;
-            border-radius: 4px;
-            border: 1px solid var(--border);
-        }
-
-        .save-btn {
-            padding: 0.4rem 0.8rem;
-            font-size: 0.8rem;
-            margin-left: 0.5rem;
-        }
-    </style>
+    <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
     <div class="container">
-        <!-- Input Section -->
-        <div class="card">
-            <h2>Vunoh Global — Diaspora Assistant</h2>
-            <p>Type your request in plain English (e.g., "I need to send 50,000 KES to my mother in Nairobi for medical bills")</p>
-            <textarea id="requestInput" placeholder="Enter your request here..."></textarea>
-            <button onclick="submitRequest()" id="submitBtn">Submit Request</button>
-            <div id="loader" class="loading">Processing with AI... Please wait.</div>
-
-            <div id="resultsArea">
-                <h3>Processing Result</h3>
-                <div class="results-grid">
-                    <div class="result-item">
-                        <label>Task Code</label>
-                        <span id="resCode">-</span>
-                    </div>
-                    <div class="result-item">
-                        <label>Detected Intent</label>
-                        <span id="resIntent">-</span>
-                    </div>
-                    <div class="result-item">
-                        <label>Risk Level</label>
-                        <span id="resRiskBadge" class="risk-badge">-</span>
-                    </div>
-                    <div class="result-item">
-                        <label>Assigned Team</label>
-                        <span id="resTeam">-</span>
-                    </div>
-                </div>
-                
-                <div class="result-item">
-                    <label>Generated Steps</label>
-                    <ol id="resSteps"></ol>
-                </div>
-
-                <div class="messages-row">
-                    <div class="msg-box">
-                        <h4>WhatsApp Message</h4>
-                        <p id="resWhatsApp"></p>
-                    </div>
-                    <div class="msg-box">
-                        <h4>Email Message</h4>
-                        <p id="resEmail"></p>
-                    </div>
-                    <div class="msg-box">
-                        <h4>SMS Message</h4>
-                        <p id="resSMS"></p>
-                    </div>
-                </div>
-            </div>
+        <div class="nav-bar">
+            <a href="/dashboard/" class="nav-link">Staff Login →</a>
         </div>
 
-        <!-- Dashboard Section -->
+        <!-- Input Section -->
         <div class="card">
-            <h2>Task Dashboard</h2>
-            <table id="tasksTable">
-                <thead>
-                    <tr>
-                        <th>Task Code</th>
-                        <th>Intent</th>
-                        <th>Status</th>
-                        <th>Risk Score</th>
-                        <th>Team</th>
-                        <th>Created At</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="tasksBody">
-                    <!-- Loaded via JS -->
-                </tbody>
-            </table>
+            <h1>Vunoh Global 🇰🇪</h1>
+            <p class="subtitle">Concierge & Task Management for Kenyans Abroad</p>
+            
+            <div class="input-grid">
+                <div class="input-group">
+                    <label>Full Name</label>
+                    <input type="text" id="custName" placeholder="e.g. John Kamau">
+                </div>
+                <div class="input-group">
+                    <label>WhatsApp / Phone</label>
+                    <input type="text" id="custPhone" placeholder="e.g. +254 711...">
+                </div>
+                <div class="input-group">
+                    <label>Email Address</label>
+                    <input type="email" id="custEmail" placeholder="e.g. john@example.com">
+                </div>
+            </div>
+
+            <textarea id="requestInput" placeholder="Describe what you need help with in Kenya... (e.g., 'I need to pay school fees for my sister in Nairobi')"></textarea>
+            <button onclick="submitRequest()" id="submitBtn" class="btn">Send</button>
+            <div id="loader" class="loading">Analyzing your request...</div>
+
+            <!-- Specific Task Result (Only visible after submission) -->
+            <div id="resultsArea">
+                <div class="success-banner">
+                    <h2 id="resSuccessTitle">Task Created Successfully</h2>
+                    <p style="margin-top: 0.5rem; color: var(--primary-dark); font-weight: 500;">Our team will communicate shortly.</p>
+                </div>
+
+                <div class="results-grid">
+                    <div class="details-col">
+                        <div class="result-item">
+                            <label>Service Category</label>
+                            <span id="resIntent">-</span>
+                        </div>
+                        <div class="result-item">
+                            <label>Risk Level</label>
+                            <span id="resRiskBadge" class="risk-chip">-</span>
+                        </div>
+                        <div class="result-item">
+                            <label>Assigned Department</label>
+                            <span id="resTeam">-</span>
+                        </div>
+                        <div class="result-item">
+                            <label>Current Status</label>
+                            <span id="resStatusBadge" class="status-badge">-</span>
+                        </div>
+                    </div>
+
+                    <div class="steps-col">
+                        <div class="result-item">
+                            <label>Our Action Plan</label>
+                            <ol id="resSteps" style="margin-left: 1.25rem; font-weight: 500;"></ol>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>Your Communication Log</h3>
+                <div class="messages-row">
+                    <!-- WhatsApp -->
+                    <div class="msg-box msg-box-whatsapp">
+                        <h4>WhatsApp Confirmation</h4>
+                        <textarea id="resWhatsApp" class="msg-textarea" readonly></textarea>
+                    </div>
+                    <!-- Email -->
+                    <div class="msg-box msg-box-email">
+                        <h4>Email Confirmation</h4>
+                        <textarea id="resEmail" class="msg-textarea" readonly></textarea>
+                    </div>
+                    <!-- SMS -->
+                    <div class="msg-box msg-box-sms">
+                        <h4>SMS Alert</h4>
+                        <textarea id="resSMS" class="msg-textarea" readonly></textarea>
+                    </div>
+                </div>
+                <p style="text-align: center; margin-top: 2rem; color: var(--text-muted); font-size: 0.9rem;">
+                    Please save your Task Code for future reference.
+                </p>
+            </div>
         </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', loadDashboard);
+        const intentMap = {
+            'send_money': 'Send Money',
+            'hire_service': 'Hire Service',
+            'verify_document': 'Verify Document',
+            'airport_transfer': 'Airport Transfer',
+            'check_status': 'Check Status'
+        };
+
+        const statusLabelMap = {
+            'Pending': 'status-pending',
+            'In Progress': 'status-inprogress',
+            'Completed': 'status-completed'
+        };
 
         async function submitRequest() {
             const message = document.getElementById('requestInput').value;
-            if (!message) return alert("Please enter a request.");
+            const name = document.getElementById('custName').value;
+            const phone = document.getElementById('custPhone').value;
+            const email = document.getElementById('custEmail').value;
+
+            if (!message) return alert("Please specify your request details.");
 
             const btn = document.getElementById('submitBtn');
             const loader = document.getElementById('loader');
@@ -278,104 +132,60 @@
                 const response = await fetch('/api/process-request/', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: message })
+                    body: JSON.stringify({ 
+                        message: message,
+                        customer_name: name || 'Valued Customer',
+                        customer_phone: phone,
+                        customer_email: email
+                    })
                 });
                 const data = await response.json();
 
                 if (data.status === 'success') {
-                    displayResult(data.task);
-                    loadDashboard();
+                    displayResult(data);
                 } else {
-                    alert("Error: " + data.message);
+                    alert("Submission Failed: " + data.message);
                 }
             } catch (err) {
                 console.error(err);
-                alert("Failed to process request.");
+                alert("Communication failure. Please check your connection.");
             } finally {
                 btn.disabled = false;
                 loader.style.display = 'none';
             }
         }
 
-        function displayResult(task) {
+        function displayResult(data) {
             const results = document.getElementById('resultsArea');
             results.style.display = 'block';
 
-            document.getElementById('resCode').textContent = task.task_code;
-            document.getElementById('resIntent').textContent = task.intent.replace('_', ' ');
+            document.getElementById('resSuccessTitle').textContent = `Task ${data.task_code} Created`;
+
+            document.getElementById('resIntent').textContent = intentMap[data.intent] || data.intent;
             
             const riskBadge = document.getElementById('resRiskBadge');
-            riskBadge.className = 'risk-badge risk-' + (task.risk_label || 'low').toLowerCase();
-            riskBadge.textContent = (task.risk_label || 'Low') + ` (${task.risk_score || 0})`;
+            riskBadge.className = 'risk-chip risk-' + (data.risk_label || 'low').toLowerCase();
+            riskBadge.textContent = (data.risk_label || 'Low');
             
-            document.getElementById('resTeam').textContent = task.employee_assignment || 'Support';
+            document.getElementById('resTeam').textContent = data.employee_assignment || 'Support';
+            
+            const statusBadge = document.getElementById('resStatusBadge');
+            statusBadge.className = 'status-badge ' + (statusLabelMap[data.task_status] || 'status-pending');
+            statusBadge.textContent = data.task_status || 'Pending';
 
-            // Stub steps if none provided by backend stub
             const stepsUl = document.getElementById('resSteps');
             stepsUl.innerHTML = '';
-            const steps = task.steps || ["Analyzing request details", "Routing to appropriate team", "Generating notifications"];
-            steps.forEach(s => {
+            (data.steps || []).forEach(s => {
                 const li = document.createElement('li');
                 li.textContent = s;
                 stepsUl.appendChild(li);
             });
 
-            document.getElementById('resWhatsApp').textContent = task.whatsapp || "Hi, your request " + task.task_code + " is being processed.";
-            document.getElementById('resEmail').textContent = task.email || "Subject: Task " + task.task_code + " Update\n\nYour request has been received.";
-            document.getElementById('resSMS').textContent = task.sms || "Vunoh: Task " + task.task_code + " received.";
-        }
+            document.getElementById('resWhatsApp').value = data.messages.whatsapp;
+            document.getElementById('resEmail').value = data.messages.email;
+            document.getElementById('resSMS').value = data.messages.sms;
 
-        async function loadDashboard() {
-            try {
-                const response = await fetch('/api/tasks/');
-                const tasks = await response.json();
-                const tbody = document.getElementById('tasksBody');
-                tbody.innerHTML = '';
-
-                tasks.forEach(task => {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td>${task.task_code}</td>
-                        <td>${task.intent.replace('_', ' ')}</td>
-                        <td>
-                            <select id="status-${task.task_code}">
-                                <option value="Pending" ${task.status === 'Pending' ? 'selected' : ''}>Pending</option>
-                                <option value="In Progress" ${task.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
-                                <option value="Completed" ${task.status === 'Completed' ? 'selected' : ''}>Completed</option>
-                            </select>
-                        </td>
-                        <td>${task.risk_score} (${task.risk_label})</td>
-                        <td>${task.employee_assignment}</td>
-                        <td>${new Date(task.created_at).toLocaleDateString()}</td>
-                        <td>
-                            <button class="save-btn" onclick="updateStatus('${task.task_code}')">Save</button>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-            } catch (err) {
-                console.error("Dashboard load failed", err);
-            }
-        }
-
-        async function updateStatus(taskCode) {
-            const status = document.getElementById(`status-${taskCode}`).value;
-            try {
-                const response = await fetch(`/api/tasks/${taskCode}/status/`, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ status: status })
-                });
-                const data = await response.json();
-                if (data.status === 'success') {
-                    alert("Status updated!");
-                } else {
-                    alert("Error: " + data.message);
-                }
-            } catch (err) {
-                console.error(err);
-                alert("Failed to update status.");
-            }
+            results.scrollIntoView({ behavior: 'smooth' });
         }
     </script>
 </body>
