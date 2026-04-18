@@ -43,53 +43,7 @@
                     <h2 id="resSuccessTitle">Task Created Successfully</h2>
                     <p style="margin-top: 0.5rem; color: var(--primary-dark); font-weight: 500;">Our team will communicate shortly.</p>
                 </div>
-
-                <div class="results-grid">
-                    <div class="details-col">
-                        <div class="result-item">
-                            <label>Service Category</label>
-                            <span id="resIntent">-</span>
-                        </div>
-                        <div class="result-item">
-                            <label>Risk Level</label>
-                            <span id="resRiskBadge" class="risk-chip">-</span>
-                        </div>
-                        <div class="result-item">
-                            <label>Assigned Department</label>
-                            <span id="resTeam">-</span>
-                        </div>
-                        <div class="result-item">
-                            <label>Current Status</label>
-                            <span id="resStatusBadge" class="status-badge">-</span>
-                        </div>
-                    </div>
-
-                    <div class="steps-col">
-                        <div class="result-item">
-                            <label>Our Action Plan</label>
-                            <ol id="resSteps" style="margin-left: 1.25rem; font-weight: 500;"></ol>
-                        </div>
-                    </div>
-                </div>
-
-                <h3>Your Communication Log</h3>
-                <div class="messages-row">
-                    <!-- WhatsApp -->
-                    <div class="msg-box msg-box-whatsapp">
-                        <h4>WhatsApp Confirmation</h4>
-                        <textarea id="resWhatsApp" class="msg-textarea" readonly></textarea>
-                    </div>
-                    <!-- Email -->
-                    <div class="msg-box msg-box-email">
-                        <h4>Email Confirmation</h4>
-                        <textarea id="resEmail" class="msg-textarea" readonly></textarea>
-                    </div>
-                    <!-- SMS -->
-                    <div class="msg-box msg-box-sms">
-                        <h4>SMS Alert</h4>
-                        <textarea id="resSMS" class="msg-textarea" readonly></textarea>
-                    </div>
-                </div>
+                
                 <p style="text-align: center; margin-top: 2rem; color: var(--text-muted); font-size: 0.9rem;">
                     Please save your Task Code for future reference.
                 </p>
@@ -98,20 +52,6 @@
     </div>
 
     <script>
-        const intentMap = {
-            'send_money': 'Send Money',
-            'hire_service': 'Hire Service',
-            'verify_document': 'Verify Document',
-            'airport_transfer': 'Airport Transfer',
-            'check_status': 'Check Status'
-        };
-
-        const statusLabelMap = {
-            'Pending': 'status-pending',
-            'In Progress': 'status-inprogress',
-            'Completed': 'status-completed'
-        };
-
         async function submitRequest() {
             const message = document.getElementById('requestInput').value;
             const name = document.getElementById('custName').value;
@@ -158,33 +98,7 @@
         function displayResult(data) {
             const results = document.getElementById('resultsArea');
             results.style.display = 'block';
-
             document.getElementById('resSuccessTitle').textContent = `Task ${data.task_code} Created`;
-
-            document.getElementById('resIntent').textContent = intentMap[data.intent] || data.intent;
-            
-            const riskBadge = document.getElementById('resRiskBadge');
-            riskBadge.className = 'risk-chip risk-' + (data.risk_label || 'low').toLowerCase();
-            riskBadge.textContent = (data.risk_label || 'Low');
-            
-            document.getElementById('resTeam').textContent = data.employee_assignment || 'Support';
-            
-            const statusBadge = document.getElementById('resStatusBadge');
-            statusBadge.className = 'status-badge ' + (statusLabelMap[data.task_status] || 'status-pending');
-            statusBadge.textContent = data.task_status || 'Pending';
-
-            const stepsUl = document.getElementById('resSteps');
-            stepsUl.innerHTML = '';
-            (data.steps || []).forEach(s => {
-                const li = document.createElement('li');
-                li.textContent = s;
-                stepsUl.appendChild(li);
-            });
-
-            document.getElementById('resWhatsApp').value = data.messages.whatsapp;
-            document.getElementById('resEmail').value = data.messages.email;
-            document.getElementById('resSMS').value = data.messages.sms;
-
             results.scrollIntoView({ behavior: 'smooth' });
         }
     </script>
